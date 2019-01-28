@@ -6,6 +6,16 @@ using Google.Apis.Services;
 using Google.Apis.YouTube.v3;
 using System.Windows.Controls;
 using System.Reflection;
+using Project.IO;
+
+//using DotNetOpenAuth.OAuth2;
+
+//using Google.Apis.Authentication;
+//using Google.Apis.Authentication.OAuth2;
+//using Google.Apis.Authentication.OAuth2.DotNetOpenAuth;
+//using Google.Apis.Samples.Helper;
+//using Google.Apis.Util;
+//using Google.Apis.YouTube.v3.Data;
 
 namespace YoutubeTool
 {
@@ -37,33 +47,36 @@ namespace YoutubeTool
 
         private void MainBorwser_LoadCompleted(Object sender, System.Windows.Navigation.NavigationEventArgs e)
         {
-            // CSS読み込み
-            
 
-
-            Console.WriteLine("Completed");
         }
 
         #region youtube
         private async void Button_Click(Object sender, RoutedEventArgs e)
         {
             try {
+                var apikey = System.IO.File.ReadAllText(@".\apikey.dat", System.Text.Encoding.UTF8);
                 var youtubeService = new YouTubeService(new BaseClientService.Initializer() {
-                    ApiKey = "APIKEY_INPUT"
+                    ApiKey = apikey
                 });
 
-                var searchListRequest = youtubeService.Search.List("snippet");
-                searchListRequest.Q = "word";
-                searchListRequest.Type = "video";
-                searchListRequest.MaxResults = 10;
-                // チャンネル指定
+                //var searchListRequest = youtubeService.Search.List("snippet");
+                ////searchListRequest.Q = "";
+                //searchListRequest.Type = "channels";
+                //searchListRequest.MaxResults = 10;
+                //// チャンネル指定
                 //searchListRequest.ChannelId = "UC2ZVDmnoZAOdLt7kI7Uaqog";
+
+                var searchListRequest = youtubeService.Channels.List("snippet");
+                searchListRequest.Id = "UC2ZVDmnoZAOdLt7kI7Uaqog";
 
                 var searchListResponse = await searchListRequest.ExecuteAsync();
 
                 foreach (var searchResult in searchListResponse.Items) {
-                    Console.WriteLine($"{searchResult.Id.VideoId}, {searchResult.Snippet.Title}");
+                    //Console.WriteLine($"{searchResult.Id.VideoId}, {searchResult.Snippet.Title}");
+                    Console.WriteLine("");
                 }
+
+
             }
             catch (Exception ex) {
                 Console.WriteLine(ex.Message);
@@ -75,19 +88,25 @@ namespace YoutubeTool
         private void Window_Loaded(Object sender, RoutedEventArgs e)
         {
             this.HtmlBox.Text =
-                System.IO.File.ReadAllText(@".\template.htm",
+                System.IO.File.ReadAllText(@".\top_page.htm",
                 System.Text.Encoding.UTF8);
         }
 
         private void UpdateButton_Click(Object sender, RoutedEventArgs e)
         {
-            //this.MainBorwser.ObjectForScripting = this;
-            this.MainBorwser.NavigateToString(this.HtmlBox.Text);
+            // this.MainBorwser.NavigateToString(this.HtmlBox.Text);
+            this.MainBorwser.Navigate("/top_page.htm");
         }
 
         private void ScriptButton_Click(Object sender, RoutedEventArgs e)
         {
-            JavaScript.Call(this.MainBorwser, "changeVideo", new String[] { "H4uwW4HjPUI" });
+            JavaScript.Call(this.MainBorwser, this.TitleBox.Text, new String[] { "H4uwW4HjPUI" });
+        }
+
+        private void MainBorwser_Navigating(Object sender, System.Windows.Navigation.NavigatingCancelEventArgs e)
+        {
+            //var uri =  e.Uri?.AbsoluteUri ?? "";
+            //Console.WriteLine(uri);
         }
     }
 }
