@@ -61,6 +61,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -79,8 +80,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ConvertExtention.cs" />
+    <Compile Include="CSV.cs" />
     <Compile Include="JavaScript.cs" />
+    <Compile Include="MathExtention.cs" />
+    <Compile Include="RSS\FeedItem.cs" />
+    <Compile Include="RSS\MarkupElement.cs" />
+    <Compile Include="RSS\RSS.cs" />
     <Compile Include="Text.cs" />
+    <Compile Include="YoutubeApi.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -124,7 +132,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\sasaki.png" />
+    <Resource Include="Resources\movie.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

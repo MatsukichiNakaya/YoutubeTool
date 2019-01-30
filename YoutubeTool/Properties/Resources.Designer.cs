@@ -61,12 +61,12 @@ namespace YoutubeTool.Properties {
         }
         
         /// <summary>
-        ///   型 System.Drawing.Bitmap のローカライズされたリソースを検索します。
+        ///   (アイコン) に類似した型 System.Drawing.Icon のローカライズされたリソースを検索します。
         /// </summary>
-        internal static System.Drawing.Bitmap sasaki {
+        internal static System.Drawing.Icon movie {
             get {
-                object obj = ResourceManager.GetObject("sasaki", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                object obj = ResourceManager.GetObject("movie", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
             }
         }
     }
