@@ -31,13 +31,21 @@ namespace YoutubeTool
                                             null, comObj, new Object[] { true });
 
             this.MainBorwser.MessageHook += MainBorwser_MessageHook;
-            this.MainBorwser.LoadCompleted += MainBorwser_LoadCompleted;
 
-            this.APIKey = File.ReadAllText(@".\apikey.dat", Encoding.UTF8);
+            this.APIKey = File.ReadAllText(@".\Dat\apikey.dat", Encoding.UTF8);
 
             MoveTopPage();
         }
 
+        /// <summary>
+        /// ブラウザのメッセージ受信
+        /// </summary>
+        /// <param name="hwnd"></param>
+        /// <param name="msg"></param>
+        /// <param name="wParam"></param>
+        /// <param name="lParam"></param>
+        /// <param name="handled"></param>
+        /// <returns></returns>
         private IntPtr MainBorwser_MessageHook(IntPtr hwnd, Int32 msg, 
                                                 IntPtr wParam, IntPtr lParam,
                                                 ref Boolean handled)
@@ -46,7 +54,16 @@ namespace YoutubeTool
         }
 
         /// <summary>
-        /// 読み込み完了イベント
+        /// ウインドウ 読み込み完了イベント
+        /// </summary>
+        private void Window_Loaded(Object sender, RoutedEventArgs e)
+        {
+            // デバッグ用のコントロール（飾り）にテキスト読み込み
+            this.HtmlBox.Text = File.ReadAllText(@".\html\channel_home.htm", Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// ブラウザ webページ読み込み完了イベント
         /// </summary>
         private void MainBorwser_LoadCompleted(Object sender, NavigationEventArgs e)
         {
@@ -76,7 +93,7 @@ namespace YoutubeTool
 
             // リストを出力する
             JavaScript.Call(this.MainBorwser, "listadd",
-                sbName.ToString(), sbID.ToString());
+                            sbName.ToString(), sbID.ToString());
         }
 
         /// <summary>
@@ -104,19 +121,30 @@ namespace YoutubeTool
             }
         }
 
+        /// <summary>
+        /// RSSフィードを使用して最新の動画を取得する
+        /// </summary>
+        /// <param name="channelID"></param>
+        /// <returns></returns>
         private FeedItem[] GetItems(String channelID)
         {
             var url = $@"https://www.youtube.com/feeds/videos.xml?channel_id={channelID}";
             return RSS.ReadFeedItems(url).ToArray();
         }
 
+        /// <summary>
+        /// RSSフィードの情報をJavascript用に変換する
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
         private String[] ConvertFeedItems(FeedItem[] items)
         {
-            var result = new String[5];
+            var result = new String[6];
             var title = new StringBuilder();
             var date = new StringBuilder();
             var elap = new StringBuilder();
             var thumb = new StringBuilder();
+            var link = new StringBuilder();
             var desc = new StringBuilder();
 
             foreach (var item in items) {
@@ -124,6 +152,7 @@ namespace YoutubeTool
                 date.Append(item.PublishDate).Append(",");
                 elap.Append(item.ElapsedTime).Append(",");
                 thumb.Append(item.ExtraItems[8].Attributes["url"]).Append(",");
+                link.Append(item.Link).Append(",");
                 if (100 < item.Summary.Length) {
                     desc.Append(item.Summary.Substring(0, 99)).Append("…").Append(",");
                 }
@@ -136,14 +165,16 @@ namespace YoutubeTool
             result[1] = date.Remove(date.Length - 1, 1).ToString();
             result[2] = elap.Remove(elap.Length - 1, 1).ToString();
             result[3] = thumb.Remove(thumb.Length - 1, 1).ToString();
-            result[4] = desc.Remove(desc.Length - 1, 1).ToString();
+            result[4] = link.Remove(link.Length - 1, 1).ToString();
+            result[5] = desc.Remove(desc.Length - 1, 1).ToString();
 
             return result;
         }
 
-
-
-
+        /// <summary>
+        /// 取得した動画一覧をページ上に追加する
+        /// </summary>
+        /// <param name="channelID"></param>
         private void SetNewVideo(String channelID)
         {
             try {
@@ -156,22 +187,7 @@ namespace YoutubeTool
             }
         }
 
-        #region youtube
-        private void Button_Click(Object sender, RoutedEventArgs e)
-        {
-            try {
 
-            }
-            catch (Exception ex) {
-                Console.WriteLine(ex.Message);
-            }
-        }
-        #endregion
-
-        private void Window_Loaded(Object sender, RoutedEventArgs e)
-        {
-            this.HtmlBox.Text = File.ReadAllText(@".\html\channel_home.htm", Encoding.UTF8);
-        }
 
         private void MoveTopPage()
         {
@@ -180,16 +196,6 @@ namespace YoutubeTool
                                             Path.GetFullPath(@".\html\channel_home.htm")
                                                 .Replace(@"\", "/"));
             this.MainBorwser.Navigate(new Uri(pagePath));
-        }
-
-        /// <summary>
-        /// Html読み込みボタン
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void UpdateButton_Click(Object sender, RoutedEventArgs e)
-        {
-            MoveTopPage();
         }
 
         /// <summary>
@@ -235,8 +241,42 @@ namespace YoutubeTool
                     await ChannelInfoSetAsync(uri.Segments[2]);
                     SetNewVideo(uri.Segments[2]);
                     break;
+                case "watch":
+                    NavigateVideo(uri);
+                    break;
                 default:
                     break;
+            }
+        }
+
+        /// <summary>
+        /// 動画再生ページへ移動
+        /// </summary>
+        /// <param name="uri"></param>
+        private void NavigateVideo(Uri uri)
+        {
+            var pagePath = String.Format("file:///{0}",
+                                           Path.GetFullPath(@".\html\play_page.htm")
+                                               .Replace(@"\", "/"));
+            var param = $"?id={uri.PathAndQuery.Split('=')[1]}";
+            var link = new Uri(pagePath + param);
+
+            this.MainBorwser.Navigate(link);
+        }
+
+        private void UpdateButton_Click(Object sender, RoutedEventArgs e)
+        {
+            // 
+            MoveTopPage();
+        }
+
+        private void ToolButton_Click(Object sender, RoutedEventArgs e)
+        {
+            if (0 < this.RowDefScript.Height.Value) {
+                this.RowDefScript.Height = new GridLength(0);
+            }
+            else {
+                this.RowDefScript.Height = new GridLength(20);
             }
         }
     }

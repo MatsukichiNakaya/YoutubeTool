@@ -9,66 +9,54 @@
         Icon="Resources/movie.ico"
         Loaded="Window_Loaded">
     <Grid>
-        <!--<Button Click="Button_Click"/>-->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/><!--1*-->
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="5*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="0"/><!--25-->
+            <RowDefinition Height="20"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        <!-- デバッグコントロール(ソース表示) -->
         <StackPanel Orientation="Horizontal">
-            <Button DockPanel.Dock="Left" x:Name="UpdateButton" Content="Update" Click="UpdateButton_Click" Padding="10,0"/>
-            <Button DockPanel.Dock="Right" Content="search" Click="Button_Click" Padding="10,0"/>
+            <Button x:Name="UpdateButton" Content="update" Click="UpdateButton_Click" Margin="5,0,0,0"/>
+            <Button x:Name="ToolButton" Content="tool" Click="ToolButton_Click" Margin="5,0,0,0"/>
         </StackPanel>
-
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="0"/><!--1*-->
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="5*"/>
-            </Grid.ColumnDefinitions>
-            <TabControl>
-                <TabItem Header="HTML">
-                    <TextBox x:Name="HtmlBox" AcceptsReturn="True"
-                         BorderThickness="0"/>
-                </TabItem>
-                <TabItem Header="JavaScript">
-                    <TextBox x:Name="ScriptTextBox" AcceptsReturn="True"
-                         BorderThickness="0"/>
-                </TabItem>
-                <TabItem Header="CSS">
-                    <TextBox x:Name="CssBox" AcceptsReturn="True"
-                         BorderThickness="0"/>
-                </TabItem>
-            </TabControl>
-            <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center"/>
+        <TabControl Grid.Row="1">
+            <TabItem Header="HTML">
+                <TextBox x:Name="HtmlBox" AcceptsReturn="True" BorderThickness="0"/>
+            </TabItem>
+            <TabItem Header="JavaScript">
+                <TextBox x:Name="ScriptTextBox" AcceptsReturn="True" BorderThickness="0"/>
+            </TabItem>
+            <TabItem Header="CSS">
+                <TextBox x:Name="CssBox" AcceptsReturn="True" BorderThickness="0"/>
+            </TabItem>
+        </TabControl>
+        <!-- 仕切り線 -->
+        <GridSplitter Grid.Column="1" Width="3" HorizontalAlignment="Center"/>
+        <!-- メインコントロール -->
+        <Grid Grid.Column="2" Grid.RowSpan="2" Background="white">
             <!-- #FFFFF0F5 -->
-            <Grid Grid.Column="2" Background="white">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="0"/> <!--20-->
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal">
-                    <TextBlock Text="function" Margin="10,0,5,0"/>
-                    <TextBox x:Name="TitleBox" Width="200"
-                         Text="" FontSize="10" Background="Transparent"/>
-                    <TextBlock Text="arg" Margin="20,0,5,0"/>
-                    <TextBox x:Name="ArgBox" Width="200"
-                             Text="" FontSize="10" />
-                    <Button DockPanel.Dock="Right" x:Name="ScriptButton" Margin="10,0" Padding="10,0"
-                            Content="script" Click="ScriptButton_Click"/>
-                </StackPanel>
-                
-                <!--<StackPanel Grid.Row="1">
-                    <Rectangle DockPanel.Dock="Left" Height="360" Width="200">
-                        <Rectangle.Fill>
-                            <ImageBrush ImageSource="Resources/sasaki.png" Stretch="Uniform"/>
-                        </Rectangle.Fill>
-                    </Rectangle>
-                    
-                </StackPanel>-->
-                <!--Height="380" Width="660"-->
-                <WebBrowser x:Name="MainBorwser" Grid.Row="1" Margin="0,0,0,0"
-                            Navigating="MainBorwser_Navigating"/>
-            </Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="RowDefScript" Height="0"/> <!--20-->
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <!-- デバッグコントロール(スクリプト実行) -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                <TextBlock Text="function" Margin="10,0,5,0"/>
+                <TextBox x:Name="TitleBox" Width="200" Text="" FontSize="10"/>
+                <TextBlock Text="arg" Margin="20,0,5,0"/>
+                <TextBox x:Name="ArgBox" Width="200" Text="" FontSize="10" />
+                <Button DockPanel.Dock="Right" x:Name="ScriptButton" Margin="10,0" Padding="10,0"
+                        Content="script" Click="ScriptButton_Click"/>
+            </StackPanel>
+            <!-- メインコントロール -->
+            <WebBrowser x:Name="MainBorwser" Grid.Row="1"
+                        Margin="0,0,0,0"
+                        Navigating="MainBorwser_Navigating"
+                        LoadCompleted="MainBorwser_LoadCompleted"/>
         </Grid>
     </Grid>
 </Window>
